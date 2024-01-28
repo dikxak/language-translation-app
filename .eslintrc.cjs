@@ -5,6 +5,7 @@ module.exports = {
     'eslint:recommended',
     'airbnb',
     'airbnb/hooks',
+    'airbnb-typescript',
     'plugin:@typescript-eslint/recommended',
     'plugin:react-hooks/recommended',
     'plugin:jsx-a11y/recommended',
@@ -12,8 +13,11 @@ module.exports = {
     'plugin:import/typescript',
     'plugin:react/jsx-runtime',
   ],
-  ignorePatterns: ['dist', '.eslintrc.cjs'],
+  ignorePatterns: ['dist', '.eslintrc.cjs', 'vite.config.ts'],
   parser: '@typescript-eslint/parser',
+  parserOptions: {
+    project: './tsconfig.json',
+  },
   plugins: ['react-refresh', 'jsx-a11y', 'prettier', 'import'],
   rules: {
     'no-console': 'warn',
@@ -27,5 +31,17 @@ module.exports = {
       'error',
       { devDependencies: ['./vite.config.ts'] },
     ],
+    'react/function-component-definition': [
+      2,
+      {
+        namedComponents: 'arrow-function',
+        unnamedComponents: 'arrow-function',
+      },
+    ],
+  },
+  settings: {
+    'import/resolver': {
+      typescript: {},
+    },
   },
 };
