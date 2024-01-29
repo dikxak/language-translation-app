@@ -54,3 +54,9 @@ export const DEFAULT_TRANSLATED_TEXT_CONTAINER_STYLES: TranslatedContainerStyles
     color: '#1c1d1a',
     backgroundColor: '#f8df6d',
   };
+
+export const FONT_SIZE_CONFIGURATION = {
+  min: 16,
+  max: 64,
+  step: 4,
+};

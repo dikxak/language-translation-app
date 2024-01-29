@@ -8,7 +8,7 @@ const App = () => (
     <h1 className="primary-heading">Translation App</h1>
     <TranslateTextInput />
     <LanguageContainer />
-    <TranslatedTextContainer />
+    <TranslatedTextContainer translatedText="" translating={false} />
   </Container>
 );
 
