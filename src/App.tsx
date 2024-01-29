@@ -1,10 +1,11 @@
+import Container from '@/components/Container';
 import TranslateTextInput from '@/components/TranslateTextInput';
 
 const App = () => (
-  <>
-    <h1>Translation App</h1>
+  <Container>
+    <h1 className="primary-heading">Translation App</h1>
     <TranslateTextInput />
-  </>
+  </Container>
 );
 
 export default App;
