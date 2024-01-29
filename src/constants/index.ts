@@ -42,4 +42,8 @@ export const TRANSLATION_LANGUAGES: TranslationLanguage[] = [
     id: 9,
     language: '🇵🇹 Portuguese',
   },
+  {
+    id: 10,
+    language: '🇬🇧 English',
+  },
 ];
