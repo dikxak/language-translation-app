@@ -1,4 +1,4 @@
-import type { TranslationLanguage } from '@/types';
+import type { TranslationLanguage, TranslatedContainerStyles } from '@/types';
 
 export const DEFAULT_TRANSLATION_CONFIG = {
   translationOption: 'auto',
@@ -47,3 +47,10 @@ export const TRANSLATION_LANGUAGES: TranslationLanguage[] = [
     language: '🇬🇧 English',
   },
 ];
+
+export const DEFAULT_TRANSLATED_TEXT_CONTAINER_STYLES: TranslatedContainerStyles =
+  {
+    fontSize: 32,
+    color: '#1c1d1a',
+    backgroundColor: '#f8df6d',
+  };
