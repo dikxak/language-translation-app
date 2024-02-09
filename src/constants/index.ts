@@ -1,6 +1,7 @@
 import type { TranslationLanguage, TranslatedContainerStyles } from '@/types';
 
 export const DEFAULT_TRANSLATION_CONFIG = {
+  translateText: '',
   translationOption: 'auto',
   isMultipleWordsTranslated: false,
 };
