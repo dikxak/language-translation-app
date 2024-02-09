@@ -1,35 +1,52 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { ToastContainer } from 'react-toastify';
 
 import MicrophoneIcon from '@/components/icons/Microphone';
+import DotsLoader from '@/components/DotsLoader';
 
-import type { TranslationConfig } from '@/types';
+import TranslationApi from '@/api/Translate';
 
 import { DEFAULT_TRANSLATION_CONFIG } from '@/constants';
+import LANGUAGE_CODES from '@/constants/languageCodes';
 
-const getPlaceholderText = (
-  isTranslationOptionEnglish: boolean,
-  isMultipleWordsTranslated: boolean,
-): string => {
-  if (isTranslationOptionEnglish && isMultipleWordsTranslated)
-    return 'Enter comma separated multiple words. Example: hello, world, how, are, you';
+import { type AutoDetectFetchResponse, type TranslationConfig } from '@/types';
 
-  if (isTranslationOptionEnglish && !isMultipleWordsTranslated)
-    return 'Enter english text to translate';
+import useDebouncedValue from '@/hooks/useDebouncedValue';
 
-  return 'Enter text to translate';
-};
+import showToast from '@/utils/showToast';
+import getPlaceholderText from '@/utils/getPlaceholderText';
 
 const TranslateTextInput = (): React.JSX.Element => {
   const [translationConfig, setTranslationConfig] = useState<TranslationConfig>(
     DEFAULT_TRANSLATION_CONFIG,
   );
+  const [isLanguageDetecting, setIsLanguageDetecting] =
+    useState<boolean>(false);
+  const [detectedLanguage, setDetectedLanguage] = useState<string>('');
 
-  const { translationOption, isMultipleWordsTranslated } = translationConfig;
+  const { translationOption, isMultipleWordsTranslated, translateText } =
+    translationConfig;
+
+  const debouncedTranslateText = useDebouncedValue<string>(
+    !(translationOption === 'english') ? translateText : '',
+    500,
+  );
+
   const isTranslationOptionEnglish = translationOption === 'english';
   const inputPlaceholder = getPlaceholderText(
     isTranslationOptionEnglish,
     isMultipleWordsTranslated,
   );
+
+  const handleTranslateTextChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    setDetectedLanguage('');
+    setTranslationConfig({
+      ...translationConfig,
+      translateText: e.target.value,
+    });
+  };
 
   const handleTranslationOptionChange = (
     e: React.ChangeEvent<HTMLInputElement>,
@@ -43,7 +60,10 @@ const TranslateTextInput = (): React.JSX.Element => {
       ...translationConfig,
       translationOption: e.target.value,
       isMultipleWordsTranslated: newIsMultipleWordsTranslated,
+      translateText: '',
     });
+    setDetectedLanguage('');
+    setIsLanguageDetecting(false);
   };
 
   const handleMultipleTranslationChange = (
@@ -73,6 +93,32 @@ const TranslateTextInput = (): React.JSX.Element => {
       </button>
     );
 
+  const dotsLoader = isLanguageDetecting && !isTranslationOptionEnglish && (
+    <DotsLoader />
+  );
+
+  useEffect(() => {
+    const detectLanguage = async () => {
+      try {
+        setIsLanguageDetecting(true);
+
+        const response = await TranslationApi.detect(
+          new URLSearchParams({ text: debouncedTranslateText }),
+        );
+        const { source_lang_code: languageCode }: AutoDetectFetchResponse =
+          await response.json();
+
+        setDetectedLanguage(LANGUAGE_CODES[languageCode]);
+      } catch (error) {
+        showToast('error', "Couldn't detect language at the moment!");
+      } finally {
+        setIsLanguageDetecting(false);
+      }
+    };
+
+    if (debouncedTranslateText) detectLanguage();
+  }, [debouncedTranslateText]);
+
   return (
     <>
       <div className="translate-text-options">
@@ -85,6 +131,7 @@ const TranslateTextInput = (): React.JSX.Element => {
             checked={!isTranslationOptionEnglish}
             value="auto"
             onChange={handleTranslationOptionChange}
+            disabled={isLanguageDetecting}
           />
         </label>
 
@@ -97,6 +144,7 @@ const TranslateTextInput = (): React.JSX.Element => {
             checked={isTranslationOptionEnglish}
             value="english"
             onChange={handleTranslationOptionChange}
+            disabled={isLanguageDetecting}
           />
         </label>
       </div>
@@ -108,9 +156,17 @@ const TranslateTextInput = (): React.JSX.Element => {
           className="translate-text-input"
           type="text"
           placeholder={inputPlaceholder}
+          value={translateText}
+          onChange={handleTranslateTextChange}
+          disabled={isLanguageDetecting}
         />
         {microphoneButtonIcon}
+        {dotsLoader}
+        {detectedLanguage && (
+          <span className="detected-language">{detectedLanguage}</span>
+        )}
       </div>
+      <ToastContainer />
     </>
   );
 };
