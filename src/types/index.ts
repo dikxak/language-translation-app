@@ -1,6 +1,7 @@
 export interface TranslationConfig {
   translateText: string;
   translationOption: string;
+  translateTextError: string;
   isMultipleWordsTranslated: boolean;
 }
 

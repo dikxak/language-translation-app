@@ -50,6 +50,10 @@
   }
 }
 
+.error-text {
+  color: $error-color;
+}
+
 // Custom inputs
 input[type='range'] {
   appearance: none;

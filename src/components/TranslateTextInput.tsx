@@ -16,6 +16,8 @@ import useDebouncedValue from '@/hooks/useDebouncedValue';
 import showToast from '@/utils/showToast';
 import getPlaceholderText from '@/utils/getPlaceholderText';
 
+const MAX_CHARACTERS_ALLOWED = 75;
+
 const TranslateTextInput = (): React.JSX.Element => {
   const [translationConfig, setTranslationConfig] = useState<TranslationConfig>(
     DEFAULT_TRANSLATION_CONFIG,
@@ -24,8 +26,12 @@ const TranslateTextInput = (): React.JSX.Element => {
     useState<boolean>(false);
   const [detectedLanguage, setDetectedLanguage] = useState<string>('');
 
-  const { translationOption, isMultipleWordsTranslated, translateText } =
-    translationConfig;
+  const {
+    translationOption,
+    isMultipleWordsTranslated,
+    translateText,
+    translateTextError,
+  } = translationConfig;
 
   const debouncedTranslateText = useDebouncedValue<string>(
     !(translationOption === 'english') ? translateText : '',
@@ -41,11 +47,23 @@ const TranslateTextInput = (): React.JSX.Element => {
   const handleTranslateTextChange = (
     e: React.ChangeEvent<HTMLInputElement>,
   ) => {
-    setDetectedLanguage('');
+    const { value } = e.target;
+
+    if (value.length > MAX_CHARACTERS_ALLOWED) {
+      setTranslationConfig({
+        ...translationConfig,
+        translateTextError: `Only ${MAX_CHARACTERS_ALLOWED} characters are allowed`,
+      });
+
+      return;
+    }
+
     setTranslationConfig({
       ...translationConfig,
-      translateText: e.target.value,
+      translateText: value,
+      translateTextError: '',
     });
+    setDetectedLanguage('');
   };
 
   const handleTranslationOptionChange = (
@@ -109,8 +127,13 @@ const TranslateTextInput = (): React.JSX.Element => {
           await response.json();
 
         setDetectedLanguage(LANGUAGE_CODES[languageCode]);
-      } catch (error) {
-        showToast('error', "Couldn't detect language at the moment!");
+      } catch (error: unknown) {
+        let errorMessage = '';
+
+        if (error instanceof Error) errorMessage = error.message;
+        else if (typeof error === 'string') errorMessage = error;
+
+        showToast('error', errorMessage);
       } finally {
         setIsLanguageDetecting(false);
       }
@@ -151,7 +174,10 @@ const TranslateTextInput = (): React.JSX.Element => {
 
       {translateMultipleWordsCheckbox}
 
-      <div className="translate-text-input-container">
+      <div
+        style={{ marginBottom: translateTextError ? '0.75rem' : '2rem' }}
+        className="translate-text-input-container"
+      >
         <input
           className="translate-text-input"
           type="text"
@@ -166,6 +192,9 @@ const TranslateTextInput = (): React.JSX.Element => {
           <span className="detected-language">{detectedLanguage}</span>
         )}
       </div>
+      {translateTextError && (
+        <p className="error-text translate-text-error">{translateTextError}</p>
+      )}
       <ToastContainer />
     </>
   );

@@ -4,6 +4,7 @@ export const DEFAULT_TRANSLATION_CONFIG = {
   translateText: '',
   translationOption: 'auto',
   isMultipleWordsTranslated: false,
+  translateTextError: '',
 };
 
 export const TRANSLATION_LANGUAGES: TranslationLanguage[] = [
