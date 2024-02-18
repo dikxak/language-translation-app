@@ -32,12 +32,13 @@ const TranslatedTextContainer = ({
   };
 
   const isStartTranslationMsgVisible = !translating && !translatedText;
+  const isTranslated = translatedText && !translating;
 
   return (
     <>
       <h2 className="secondary-heading">Output</h2>
       <div className="translated-text-container">
-        {translatedText && (
+        {isTranslated && (
           <div className="customization-container">
             <label htmlFor="fontSize">
               Update font size ({`${fontSize}px`})
@@ -78,11 +79,12 @@ const TranslatedTextContainer = ({
             </label>
           </div>
         )}
+
         <div
           style={containerStyles}
-          className={`translated-text ${translatedText ? 'ellipse-open-animation' : ''}`}
+          className={`translated-text ${isTranslated ? 'ellipse-open-animation' : ''}`}
         >
-          Hola!
+          {isTranslated ? translatedText : ''}
         </div>
 
         {isStartTranslationMsgVisible && (
