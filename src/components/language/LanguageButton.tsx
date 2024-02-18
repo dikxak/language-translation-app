@@ -1,11 +1,17 @@
 interface LanguageButtonProps {
   children: string;
+  onClick: () => void;
 }
 
 const LanguageButton = ({
   children,
+  onClick,
 }: LanguageButtonProps): React.JSX.Element => (
-  <button type="button" className="btn btn-tertiary btn-select">
+  <button
+    onClick={onClick}
+    type="button"
+    className="btn btn-tertiary btn-select"
+  >
     {children}
   </button>
 );

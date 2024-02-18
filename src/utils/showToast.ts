@@ -1,6 +1,6 @@
 import { toast, Bounce, ToastOptions } from 'react-toastify';
 
-type ToastState = 'error' | 'success';
+type ToastState = 'error' | 'success' | 'info' | 'warn';
 
 const showToast = (state: ToastState, message: string) => {
   const toastObj: ToastOptions = {
@@ -21,6 +21,12 @@ const showToast = (state: ToastState, message: string) => {
       break;
     case 'success':
       toast.success(message, toastObj);
+      break;
+    case 'info':
+      toast.info(message, toastObj);
+      break;
+    case 'warn':
+      toast.warn(message, toastObj);
       break;
     default:
       toast.info('', toastObj);

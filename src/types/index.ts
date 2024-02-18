@@ -2,12 +2,14 @@ export interface TranslationConfig {
   translateText: string;
   translationOption: string;
   translateTextError: string;
+  translateLanguageCode: string;
   isMultipleWordsTranslated: boolean;
 }
 
 export interface TranslationLanguage {
   id: number;
   language: string;
+  code: string;
 }
 
 export interface TranslatedContainerStyles {

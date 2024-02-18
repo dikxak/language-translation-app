@@ -6,7 +6,6 @@ import DotsLoader from '@/components/DotsLoader';
 
 import TranslationApi from '@/api/Translate';
 
-import { DEFAULT_TRANSLATION_CONFIG } from '@/constants';
 import LANGUAGE_CODES from '@/constants/languageCodes';
 
 import { type AutoDetectFetchResponse, type TranslationConfig } from '@/types';
@@ -18,10 +17,15 @@ import getPlaceholderText from '@/utils/getPlaceholderText';
 
 const MAX_CHARACTERS_ALLOWED = 75;
 
-const TranslateTextInput = (): React.JSX.Element => {
-  const [translationConfig, setTranslationConfig] = useState<TranslationConfig>(
-    DEFAULT_TRANSLATION_CONFIG,
-  );
+interface TranslationTextInputProps {
+  translationConfig: TranslationConfig;
+  setTranslationConfig: React.Dispatch<React.SetStateAction<TranslationConfig>>;
+}
+
+const TranslateTextInput = ({
+  translationConfig,
+  setTranslationConfig,
+}: TranslationTextInputProps): React.JSX.Element => {
   const [isLanguageDetecting, setIsLanguageDetecting] =
     useState<boolean>(false);
   const [detectedLanguage, setDetectedLanguage] = useState<string>('');
@@ -74,11 +78,14 @@ const TranslateTextInput = (): React.JSX.Element => {
         ? false
         : translationConfig.isMultipleWordsTranslated;
 
+    const translateLanguageCode = e.target.value === 'english' ? 'en' : '';
+
     setTranslationConfig({
       ...translationConfig,
       translationOption: e.target.value,
       isMultipleWordsTranslated: newIsMultipleWordsTranslated,
       translateText: '',
+      translateLanguageCode,
     });
     setDetectedLanguage('');
     setIsLanguageDetecting(false);
@@ -89,6 +96,9 @@ const TranslateTextInput = (): React.JSX.Element => {
   ) => {
     setTranslationConfig({
       ...translationConfig,
+      translateText: '',
+      translateLanguageCode: 'en',
+      translateTextError: '',
       isMultipleWordsTranslated: e.target.checked,
     });
   };
@@ -127,6 +137,10 @@ const TranslateTextInput = (): React.JSX.Element => {
           await response.json();
 
         setDetectedLanguage(LANGUAGE_CODES[languageCode]);
+        setTranslationConfig((prevState) => ({
+          ...prevState,
+          translateLanguageCode: languageCode,
+        }));
       } catch (error: unknown) {
         let errorMessage = '';
 
@@ -140,7 +154,7 @@ const TranslateTextInput = (): React.JSX.Element => {
     };
 
     if (debouncedTranslateText) detectLanguage();
-  }, [debouncedTranslateText]);
+  }, [debouncedTranslateText, setTranslationConfig]);
 
   return (
     <>
